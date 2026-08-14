@@ -196,7 +196,7 @@ with gr.Blocks(title="DWDM KPI Trend Forecast") as demo:
             )
             sensitivity = gr.Number(
                 label="Receiver Optical Power Sensitivity",
-                value=-28.0,
+                value=-16.0,
                 step=0.1,
             )
             run = gr.Button("Forecast", variant="primary")
