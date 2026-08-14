@@ -1,0 +1,5 @@
+# Ignore Excel files
+*.xlsx
+
+# Ignore Claude folder
+.claude/

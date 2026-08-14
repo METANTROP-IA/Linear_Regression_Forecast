@@ -11,15 +11,41 @@ from datetime import datetime, timedelta
 import gradio as gr
 import matplotlib
 import numpy as np
+import openpyxl
 import pandas as pd
+from openpyxl.styles import Font
 from sklearn.linear_model import LinearRegression
 
 matplotlib.use("Agg")  # No GUI backend: figures are handed to Gradio, not shown
 import matplotlib.pyplot as plt
 
 FMT = "%m/%d/%Y %H:%M:%S"
-DEFAULT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "Historical_Performance.xlsx")
+HERE = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_FILE = os.path.join(HERE, "Historical_Performance_Template.xlsx")
+
+# Title line of the NMS Optical Power Report, with the column widths it exports.
+TEMPLATE_HEADER = (("Monitored Object", 55.0),
+                   ("Performance Event", 20.0),
+                   ("Monitor Period", 15.0),
+                   ("End Time", 20.0),
+                   ("Value", 10.0))
+
+
+def write_template(path=TEMPLATE_FILE):
+    """Write an empty Optical Power Report: the NMS title line and no samples.
+
+    Handed to the user through the Download Template button so the uploaded
+    report always carries the columns read_report() looks for.
+    """
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Sheet1"
+    for i, (name, width) in enumerate(TEMPLATE_HEADER, start=1):
+        cell = ws.cell(row=1, column=i, value=name)
+        cell.font = Font(name="Arial", size=11, bold=True)
+        ws.column_dimensions[cell.column_letter].width = width
+    wb.save(path)
+    return path
 
 
 def read_report(dataset):
@@ -178,12 +204,16 @@ def forecast(dataset, sensitivity):
                             x_at_threshold, predicted_date))
 
 
+if not os.path.exists(TEMPLATE_FILE):  # keep the download button always served
+    write_template()
+
 with gr.Blocks(title="DWDM KPI Trend Forecast") as demo:
     gr.Markdown(
         "# Linear Regression Trend Forecast for DWDM KPI's\n"
         "Upload an Optical Power Report (.xlsx with the columns **End Time** and "
         "**Value**), enter the Receiver Optical Power Sensitivity and get the "
-        "forecast of when the Optical Power will reach it."
+        "forecast of when the Optical Power will reach it.\n\n"
+        "No report at hand? Download the empty template below and fill it in."
     )
 
     with gr.Row():
@@ -192,11 +222,14 @@ with gr.Blocks(title="DWDM KPI Trend Forecast") as demo:
                 label="Optical Power Report (.xlsx)",
                 file_types=[".xlsx", ".xls"],
                 type="filepath",
-                value=DEFAULT_FILE if os.path.exists(DEFAULT_FILE) else None,
+            )
+            gr.DownloadButton(
+                label="Download Template (Historical_Performance.xlsx)",
+                value=TEMPLATE_FILE,
             )
             sensitivity = gr.Number(
                 label="Receiver Optical Power Sensitivity",
-                value=-28.0,
+                value=-16.0,
                 step=0.1,
             )
             run = gr.Button("Forecast", variant="primary")
