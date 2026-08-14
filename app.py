@@ -251,4 +251,4 @@ with gr.Blocks(title="DWDM KPI Trend Forecast") as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(inbrowser=True)  # open the default browser on the app URL
