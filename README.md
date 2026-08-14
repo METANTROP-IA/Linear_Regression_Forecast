@@ -1,4 +1,4 @@
 # DWDM KPI Linear Regression Trend Forecast
-## Requirement: Python >= 3.10
-## Install: pip install -r requirements.txt
-## Run: python app.py
+## PREPARATION: Please install Python >= 3.10.20
+## INSTALLATION: pip install -r requirements.txt
+## RUN: python app.py
