@@ -1,2 +1,3 @@
 # DWDM KPI Linear Regression Trend Forecast
-## Install with:  pip install -r requirements.txt
+## Install: pip install -r requirements.txt
+## Run: python app.py
