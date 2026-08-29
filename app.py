@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 FMT = "%m/%d/%Y %H:%M:%S"
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_FILE = os.path.join(HERE, "Historical_Performance_Template.xlsx")
+EXAMPLE_FILE = os.path.join(HERE, "Historical_Performance.xlsx")
 
 # Title line of the NMS Optical Power Report, with the column widths it exports.
 TEMPLATE_HEADER = (("Monitored Object", 55.0),
@@ -167,7 +168,6 @@ def forecast(dataset, sensitivity):
     lr.fit(x, y)
     w = lr.coef_[0]
     b = lr.intercept_
-    r2 = lr.score(x, y)
 
     x_at_threshold = None
     predicted_date = None
@@ -192,7 +192,6 @@ def forecast(dataset, sensitivity):
         f"to {timestamps[-1].strftime(FMT)}",
         f"- **Slope (w):** {w:.6f} units/day",
         f"- **Bias (b):** {b:.6f}",
-        f"- **R²:** {r2:.4f}",
         "",
         verdict,
     ])
@@ -249,6 +248,17 @@ with gr.Blocks(title="DWDM KPI Trend Forecast") as demo:
         inputs=[dataset, sensitivity],
         outputs=[summary, observed_plot, fit_plot, forecast_plot],
     )
+
+    if os.path.exists(EXAMPLE_FILE):
+        gr.Markdown("## You could choose the example below ⬇️")
+        gr.Examples(
+            examples=[[EXAMPLE_FILE, -16.0]],
+            inputs=[dataset, sensitivity],
+            outputs=[summary, observed_plot, fit_plot, forecast_plot],
+            fn=forecast,
+            label="Examples",
+            cache_examples=False,
+        )
 
 if __name__ == "__main__":
     demo.launch(inbrowser=True)  # open the default browser on the app URL
