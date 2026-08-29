@@ -1,5 +1,5 @@
 # Ignore Excel files
-*.xlsx
+Historical_Performance_Original.xlsx
 
 # Ignore Claude folder
 .claude/
